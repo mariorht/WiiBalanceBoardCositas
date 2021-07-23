@@ -1,101 +1,60 @@
-import PySimpleGUI as sg
+#!/usr/bin/env python
+
 import matplotlib.pyplot as plt
 import numpy as np
-
-
-NO_LIST = np.zeros(1000)
-NE_LIST = np.zeros(1000)
-SO_LIST = np.zeros(1000)
-SE_LIST = np.zeros(1000)
-index = 0
-def new_point(NO, NE, SO, SE):
-    global index
-
-    NO_LIST[index] = NO
-    NE_LIST[index] = NE
-    SE_LIST[index] = SE
-    SO_LIST[index] = SO
-    
-    plt.clf()
-    plt.subplot(4,1,1)
-    plt.plot(NO_LIST)
-
-    plt.subplot(4,1,2)
-    plt.plot(NE_LIST)
-    
-    plt.subplot(4,1,3)
-    plt.plot(SE_LIST)
-    
-    plt.subplot(4,1,4)
-    plt.plot(SO_LIST)
-
-    plt.show(block=False)
-    index = index +1
-    if index==1000:
-        index = 0
-
-
-
-
-
-
-
-#################################################################################
-
 from wiiBoard import wiiBoard
-
-wiiB = wiiBoard()
-wiiB.connect()
-wiiB.print_info()
+import p5
+from scipy.interpolate import interp1d
 
 
-left_column = [
-    [sg.Text(0,key="NO",size=(10,1))],
-    [sg.Text(0,key="SO",size=(10,1))]
-]
-right_column = [
-    [sg.Text(0,key="NE",size=(10,1))],
-    [sg.Text(0,key="SE",size=(10,1))]
-]
+windowWidth, windowHeight = 480, 360
+minX = -400000
+maxX = 400000
+minY = -200000
+maxY = 200000
 
-layout = [
-    [
-        sg.Column(left_column),
-        sg.VSeperator(),
-        sg.Column(right_column),
-    ]
-]
 
-new_point(0,0,0,0)
-# plt.show()
+def setup():
+    p5.size(windowWidth, windowHeight)
+    p5.no_stroke()
+    p5.background(204)
 
-# Create the window
-window = sg.Window("Demo", layout)
+def draw():
+    update_wiiBoard()
+
+
+def key_pressed(event):
+    p5.background(204)
 
 
 
 
 
-# Create an event loop
-while True:
-    event, values = window.read(timeout=1)
-    # End program if user closes window or
-    # presses the OK button
-    if event == "OK" or event == sg.WIN_CLOSED:
-        break
-
+def update_wiiBoard():
     try:
         NO, NE, SO, SE = wiiB.read_events()
-        window["NO"].update(NO)
-        window["SO"].update(SO)
-        window["NE"].update(NE)
-        window["SE"].update(SE)
+        meanX = (NE + SE - NO - SO)*43
+        meanY = (NO + NE - SO - SE)*23
 
-        new_point(NO, NE, SO, SE)
+        p5.fill(0,0,255,100)
+        p5.circle((mx(meanX), my(meanY)), 10.0)
 
 
     except:
         pass
 
-    
-window.close()    
+
+if __name__ == '__main__':
+    wiiB = wiiBoard()
+    wiiB.connect()
+    wiiB.print_info()
+    f = open("values.txt", "w")
+
+    mx = interp1d([minX, maxX],[0,windowWidth])
+    my = interp1d([minY, maxY],[windowHeight,0])
+
+    p5.run()
+
+
+
+        
