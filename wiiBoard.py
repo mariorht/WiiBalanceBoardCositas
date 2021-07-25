@@ -1,14 +1,22 @@
 from select import poll, POLLIN
 from inspect import getmembers
 from pprint import pprint
+import numpy as np
 import xwiimote
 
-
+NO_base, NE_base, SO_base, SE_base = 0,0,0,0
+SENSOR_FACTOR_SEGURIDAD = 100
 class wiiBoard:
     def __init__(self):
         self.dev = None
         self.p = None
-    
+
+        self.NO_buffer = np.zeros(5)
+        self.NE_buffer = np.zeros(5)
+        self.SO_buffer = np.zeros(5)
+        self.SE_buffer = np.zeros(5)
+
+
     def connect(self):
         # display a constant
         print ("=== " + xwiimote.NAME_CORE + " ===")
@@ -78,9 +86,30 @@ class wiiBoard:
                 NO = evt.get_abs(2)[0]
                 SO = evt.get_abs(3)[0]
 
-                return NO, NE, SO, SE
-                # print(NO,NE)
-                # print(SO,SE)            
+                if NO < NO_base + SENSOR_FACTOR_SEGURIDAD:
+                    NO = 0
+                if NE < NE_base + SENSOR_FACTOR_SEGURIDAD:
+                    NE = 0
+                if SO < SO_base + SENSOR_FACTOR_SEGURIDAD:
+                    NO = 0
+                if SE < SE_base + SENSOR_FACTOR_SEGURIDAD:
+                    SE = 0
+
+                
+                self.NO_buffer = np.roll(self.NO_buffer, -1)
+                self.NO_buffer[-1] = NO
+
+                self.NE_buffer = np.roll(self.NE_buffer, -1)
+                self.NE_buffer[-1] = NE
+
+                self.SO_buffer = np.roll(self.SO_buffer, -1)
+                self.SO_buffer[-1] = SO
+
+                self.SE_buffer = np.roll(self.SE_buffer, -1)
+                self.SE_buffer[-1] = SE
+
+                return np.median(self.NO_buffer), np.median(self.NE_buffer), np.median(self.SO_buffer), np.median(self.SE_buffer)
+           
 
             else:
                 # print("Evento que no es EVENT_BALANCE_BOARD")
@@ -89,3 +118,24 @@ class wiiBoard:
         except IOError as e:
             if e.errno != errno.EAGAIN:
                 print ("Bad")
+
+
+    def getSensorStatus(self):
+        NO, NE, SO, SE = self.read_events()
+
+        total = (NE + SE + NO + SO)
+        x = NE + SE - NO - SO
+        y = NO + NE - SO - SE
+
+        if(total != 0):
+            return x/total, y/total
+        else:
+            return 0, 0
+
+
+    def calibrar(self):
+        try:
+            NO_base, NE_base, SO_base, SE_base = self.read_events()
+            print("Calibrado", NO_base, NE_base, SO_base, SE_base)
+        except:
+            print("Error de calibración")
