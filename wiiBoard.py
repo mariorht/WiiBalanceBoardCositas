@@ -119,6 +119,9 @@ class wiiBoard:
             if e.errno != errno.EAGAIN:
                 print ("Bad")
 
+    def getBatteryLevel(self):
+        return self.dev.get_battery()
+
 
     def getSensorStatus(self):
         NO, NE, SO, SE = self.read_events()
