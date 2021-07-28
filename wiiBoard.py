@@ -6,15 +6,18 @@ import xwiimote
 
 NO_base, NE_base, SO_base, SE_base = 0,0,0,0
 SENSOR_FACTOR_SEGURIDAD = 100
+MEDIAN_FILTER_LENGTH = 10
+
+
 class wiiBoard:
     def __init__(self):
         self.dev = None
         self.p = None
 
-        self.NO_buffer = np.zeros(5)
-        self.NE_buffer = np.zeros(5)
-        self.SO_buffer = np.zeros(5)
-        self.SE_buffer = np.zeros(5)
+        self.NO_buffer = np.zeros(MEDIAN_FILTER_LENGTH)
+        self.NE_buffer = np.zeros(MEDIAN_FILTER_LENGTH)
+        self.SO_buffer = np.zeros(MEDIAN_FILTER_LENGTH)
+        self.SE_buffer = np.zeros(MEDIAN_FILTER_LENGTH)
 
 
     def connect(self):
@@ -125,6 +128,11 @@ class wiiBoard:
 
     def getSensorStatus(self):
         NO, NE, SO, SE = self.read_events()
+        
+        NO = NO - NO_base
+        NE = NE - NE_base
+        SO = SO - SO_base
+        SE = SE - SE_base
 
         total = (NE + SE + NO + SO)
         x = NE + SE - NO - SO

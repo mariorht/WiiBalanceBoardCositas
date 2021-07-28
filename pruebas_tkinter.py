@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import tkinter as tk
+from tkinter.constants import COMMAND
 from wiiBoard import wiiBoard
 from p5 import remap
+from datetime import datetime
 
 windowWidth, windowHeight = 1200, 1000
 rectW, rectH = 250, 150
@@ -30,15 +32,27 @@ class Application(tk.Frame):
         # Tk
         self.master = master
         self.pack()
+
         self.create_widgets()
         self.check_wiiBoard()
         self.check_wiiBoardBattery()
 
 
     def create_widgets(self):
+        self.createCanvas()
+
+        self.calibrateButton = tk.Button(self.canvas, text = "Calibrar",  command = self.wiiB.calibrar, width=15)
+        self.calibrateButton.place(x=50, y = 50)
+
+        self.saving = False
+        self.recButton = tk.Button(self.canvas, text = "Start saving",  command = self.startSave, width=15)
+        self.recButton.place(x=50, y = 100)
+
+
+    def createCanvas(self):
         self.canvas = tk.Canvas(self, width=windowWidth, height=windowHeight)
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
-       
+
         # self.rectangle = self.canvas.create_rectangle(windowWidth/2-rectW/2, windowHeight/2-rectH/2, windowWidth/2+rectW/2, windowHeight/2+rectH/2)
 
         self.tabla = tk.PhotoImage(file='images/tabla.png')
@@ -51,7 +65,19 @@ class Application(tk.Frame):
 
         lbl_font = ("Sans sheriff", 18, "bold")
         self.wiiBoard_battery_Label = self.canvas.create_text(windowWidth - 200, 50, text="100%", font=lbl_font)
-        
+
+
+
+    def startSave(self):
+        if(self.saving == False):
+            self.recButton['text'] = "Stop saving"
+            self.file = open("savings/{}.csv".format(datetime.now()), 'w')
+            self.saving = True
+
+        else:
+            self.recButton['text'] = "Start saving"
+            self.saving = False
+            self.file.close()
 
 
     def get_COG_position(self):
@@ -72,6 +98,10 @@ class Application(tk.Frame):
     def check_wiiBoard(self):
         x, y = self.update_wiiBoard()
         self.update_COG_position(x, y)
+
+        if self.saving == True:
+            self.file.write("{},{}\n".format(x,y))
+
         self.master.after(1000//FPS, self.check_wiiBoard)
 
     def check_wiiBoardBattery(self):
