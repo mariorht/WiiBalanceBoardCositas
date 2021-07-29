@@ -26,7 +26,7 @@ class Application(tk.Frame):
         super().__init__(master)
 
         #webcam
-        self.cam = webCam()
+        self.cam = webCam(FPS)
         self.cam.initCamera()
 
         # WiiBoard
@@ -93,8 +93,10 @@ class Application(tk.Frame):
     def startSave(self):
         if(self.saving == False):
             self.recButton['text'] = "Stop saving"
-            self.file = open("savings/{}.csv".format(datetime.now()), 'w')
-            self.saving = True
+            now = datetime.now()
+            # self.file = open("savings/{}.csv".format(now), 'w')
+            self.cam.startSavingVideo("savings/prueba.mp4".format(now))
+            # self.saving = True
 
         else:
             self.recButton['text'] = "Start saving"
