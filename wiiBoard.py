@@ -129,10 +129,10 @@ class wiiBoard:
     def getSensorStatus(self):
         NO, NE, SO, SE = self.read_events()
         
-        NO = NO - NO_base
-        NE = NE - NE_base
-        SO = SO - SO_base
-        SE = SE - SE_base
+        # NO = NO - NO_base
+        # NE = NE - NE_base
+        # SO = SO - SO_base
+        # SE = SE - SE_base
 
         total = (NE + SE + NO + SO)
         x = NE + SE - NO - SO
