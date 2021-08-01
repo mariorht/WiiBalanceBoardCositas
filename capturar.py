@@ -95,13 +95,14 @@ class Application(tk.Frame):
         if(self.saving == False):
             self.recButton['text'] = "Stop saving"
             now = datetime.now()
-            # self.file = open("savings/{}.csv".format(now), 'w')
-            self.cam.startSavingVideo("savings/prueba.mp4".format(now))
-            # self.saving = True
+            self.file = open("savings/{}.csv".format(now), 'w')
+            self.cam.startSavingVideo("savings/{}.avi".format(now))
+            self.saving = True
 
         else:
             self.recButton['text'] = "Start saving"
             self.saving = False
+            self.cam.stopSavingVideo()
             self.file.close()
 
 
