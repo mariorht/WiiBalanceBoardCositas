@@ -1,1 +1,1 @@
-Se necesita xwiimote, xwiimote-bindings y p5
+Se necesita xwiimote, xwiimote-bindings y opencv
