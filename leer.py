@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import tkinter as tk
 from tkinter.constants import COMMAND
+from tkinter import filedialog
 from datetime import datetime
 import numpy as np
 from videoPlayer import videoPlayer
@@ -101,8 +102,12 @@ class Application(tk.Frame):
 
 
     def openVideo(self):
-        self.videoPlayer.openVideo("savings/2021-08-01 17:59:37.579707.avi")
-        print(self.videoPlayer.getTotalFrames())
+        file = tk.filedialog.askopenfilename()
+        self.videoPlayer.openVideo(file)
+        print("Frames: ", self.videoPlayer.getTotalFrames())
+        img = self.videoPlayer.getFrame()
+        self.labelVideo.configure(image=img)
+        self.labelVideo.image = img
 
 
 
