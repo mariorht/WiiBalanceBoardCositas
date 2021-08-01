@@ -1,4 +1,3 @@
-from tkinter.constants import NONE
 import cv2
 import imutils
 from PIL import Image
@@ -8,13 +7,13 @@ aaa = 0
 class webCam:
     def __init__(self):
         # print(cv2.getBuildInformation())
-        self.cap = NONE
-        self.writer = NONE
-        self.fps = NONE
+        self.cap = None
+        self.writer = None
+        self.fps = None
         self.saving = False
 
     def __del__(self):
-        if(self.cap != NONE):
+        if(self.cap != None):
             self.cap.release()
 
     def initCamera(self):
@@ -26,7 +25,7 @@ class webCam:
         #self.cap.get(cv2.CAP_PROP_FPS)
 
     def getFrame(self):
-        if(self.cap == NONE):
+        if(self.cap == None):
             print("NO HAY CAMARA")
             return
 
@@ -54,4 +53,4 @@ class webCam:
     def stopSavingVideo(self):
         self.saving = False
         self.writer.release()
-        self.writer = NONE
+        self.writer = None
