@@ -6,12 +6,11 @@ from PIL import ImageTk
 
 
 class webCam:
-    def __init__(self, fps):
+    def __init__(self):
         # print(cv2.getBuildInformation())
         self.cap = NONE
         self.writer = NONE
-        self.fps = fps
-
+        self.fps = NONE
 
     def __del__(self):
         if(self.cap != NONE):
@@ -19,7 +18,10 @@ class webCam:
 
     def initCamera(self):
         self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-
+        self.fps = self.getFPS()
+        
+    def getFPS(self):
+        return self.cap.get(cv2.CAP_PROP_FPS)
 
     def getFrame(self):
         if(self.cap == NONE):
@@ -32,6 +34,7 @@ class webCam:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             if(self.writer != NONE):
+                print("aaaa")
                 self.writer.write(frame)
 
             im = Image.fromarray(frame)
@@ -43,9 +46,7 @@ class webCam:
 
 
     def startSavingVideo(self, path):
-        print(path)
         fourcc = fourcc= cv2.VideoWriter_fourcc('M','J', 'P', 'G')
-
         self.writer = cv2.VideoWriter('path', fourcc, self.fps, (640,480))
 
     def stopSavingVideo(self):

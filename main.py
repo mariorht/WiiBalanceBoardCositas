@@ -1,19 +1,18 @@
 #!/usr/bin/env python
-
 import tkinter as tk
 from tkinter.constants import COMMAND
 from wiiBoard import wiiBoard
 from webCam import webCam
-from p5 import remap
 from datetime import datetime
+import numpy as np
 
 windowWidth, windowHeight = 1400, 1000
 canvasWidth, canvasHeight = 800, windowHeight
 rectW, rectH = 250, 150
 imageW, imageH, offsetX = 285, 900, 5
 CIRCLE_RADIUS = 6
-FPS = 100
-N_CIRCLES = 50
+FPS = 30 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
+N_CIRCLES = 15
 
 
 def _create_circle(self, x, y, r, **kwargs):
@@ -26,8 +25,10 @@ class Application(tk.Frame):
         super().__init__(master)
 
         #webcam
-        self.cam = webCam(FPS)
+        self.cam = webCam()
         self.cam.initCamera()
+        FPS = self.cam.getFPS()
+        print("FPS: ", FPS)
 
         # WiiBoard
         self.wiiB = wiiBoard()
@@ -40,8 +41,8 @@ class Application(tk.Frame):
         self.pack()
 
         self.create_widgets()
-        self.check_wiiBoard()
-        self.check_wiiBoardBattery()
+        self.startWiiBoardLoop()
+        self.startWiiBoardBatteryPolling()
 
 
     def create_widgets(self):
@@ -119,6 +120,12 @@ class Application(tk.Frame):
         self.set_COG_postion(x, y)
 
 
+    def startWiiBoardLoop(self):
+        self.updateCamera()
+        self.check_wiiBoard()
+        self.master.after(1000//FPS, self.startWiiBoardLoop)
+
+
     def check_wiiBoard(self):
         x, y = self.update_wiiBoard()
         self.update_COG_position(x, y)
@@ -126,23 +133,20 @@ class Application(tk.Frame):
         if self.saving == True:
             self.file.write("{},{}\n".format(x,y))
 
-        self.updateCamera()
-        self.master.after(1000//FPS, self.check_wiiBoard)
-
-    def check_wiiBoardBattery(self):
+    def startWiiBoardBatteryPolling(self):
         battery = self.wiiB.getBatteryLevel()
         self.canvas.itemconfig(self.wiiBoard_battery_Label, text="wiiBoard battery: {}%".format(battery))
         if battery <= 20:
             self.canvas.itemconfig(self.wiiBoard_battery_Label, fill="red")
 
-        self.master.after(5000, self.check_wiiBoardBattery)
+        self.master.after(5000, self.startWiiBoardBatteryPolling)
 
 
     def update_wiiBoard(self):
         try:
             x, y = self.wiiB.getSensorStatus()
-            circleX = remap(x,(-1, 1),(0,rectW)) + (canvasWidth - rectW)/2
-            circleY = remap(y,(-1, 1),(rectH,0)) + (canvasHeight-rectH)/2
+            circleX = np.interp(x,(-1, 1),(0,rectW)) + (canvasWidth - rectW)/2
+            circleY = np.interp(y,(-1, 1),(rectH,0)) + (canvasHeight-rectH)/2
                     
         except:
             circleX = canvasWidth/2

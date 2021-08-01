@@ -94,11 +94,11 @@ class wiiBoard:
                 if NE < NE_base + SENSOR_FACTOR_SEGURIDAD:
                     NE = 0
                 if SO < SO_base + SENSOR_FACTOR_SEGURIDAD:
-                    NO = 0
+                    SO = 0
                 if SE < SE_base + SENSOR_FACTOR_SEGURIDAD:
                     SE = 0
 
-                
+               
                 self.NO_buffer = np.roll(self.NO_buffer, -1)
                 self.NO_buffer[-1] = NO
 
