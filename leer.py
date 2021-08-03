@@ -12,7 +12,7 @@ canvasWidth, canvasHeight = 800, windowHeight
 rectW, rectH = 250, 150
 imageW, imageH, offsetX = 285, 900, 5
 CIRCLE_RADIUS = 6
-FPS = 30 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
+FPS = 25 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
 N_CIRCLES = 1
 
 

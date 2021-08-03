@@ -5,8 +5,8 @@ import numpy as np
 import xwiimote
 
 NO_base, NE_base, SO_base, SE_base = 0,0,0,0
-SENSOR_FACTOR_SEGURIDAD = 100
-MEDIAN_FILTER_LENGTH = 10
+SENSOR_FACTOR_SEGURIDAD = 200
+MEDIAN_FILTER_LENGTH = 3
 
 
 class wiiBoard:
@@ -128,7 +128,7 @@ class wiiBoard:
 
     def getSensorStatus(self):
         NO, NE, SO, SE = self.read_events()
-        
+       
         # NO = NO - NO_base
         # NE = NE - NE_base
         # SO = SO - SO_base

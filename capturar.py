@@ -11,8 +11,8 @@ canvasWidth, canvasHeight = 800, windowHeight
 rectW, rectH = 250, 150
 imageW, imageH, offsetX = 285, 900, 5
 CIRCLE_RADIUS = 6
-FPS = 30 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
-N_CIRCLES = 15
+FPS = 50 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
+N_CIRCLES = 25
 
 
 def _create_circle(self, x, y, r, **kwargs):
@@ -24,6 +24,9 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
 
+        #chapuza para que la wiiborad vaya al doble de FPS que la cámara
+        self.flag = True 
+        
         #webcam
         self.cam = webCam()
         self.cam.initCamera()
@@ -122,7 +125,12 @@ class Application(tk.Frame):
 
 
     def startWiiBoardLoop(self):
-        self.updateCamera()
+        if(self.flag):
+            self.flag = False
+            self.updateCamera()
+        else:
+            self.flag = True
+
         self.check_wiiBoard()
         self.master.after(1000//FPS, self.startWiiBoardLoop)
 
@@ -130,6 +138,9 @@ class Application(tk.Frame):
     def check_wiiBoard(self):
         x, y = self.update_wiiBoard()
         self.update_COG_position(x, y)
+
+        if self.flag:
+            return
 
         if self.saving == True:
             self.file.write("{},{}\n".format(x,y))
