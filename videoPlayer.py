@@ -23,11 +23,13 @@ class videoPlayer:
             print("No hay un archivo de video abierto")
             return 0
 
-    def getFrame(self):
+    def getFrame(self, frame_number):
         if self.cap.isOpened()== False:
             print("No hay un archivo de video abierto")
             return
         
+
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
         ret, frame = self.cap.read()
         if ret == True:
             frame = imutils.resize(frame, width=640, height = 480)

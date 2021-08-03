@@ -5,6 +5,7 @@ from tkinter import filedialog
 from datetime import datetime
 import numpy as np
 from videoPlayer import videoPlayer
+import csv
 
 windowWidth, windowHeight = 1400, 1000
 canvasWidth, canvasHeight = 800, windowHeight
@@ -12,7 +13,7 @@ rectW, rectH = 250, 150
 imageW, imageH, offsetX = 285, 900, 5
 CIRCLE_RADIUS = 6
 FPS = 30 # se sobbreescribirá al valor que de la webcam para mantener un solo hilo
-N_CIRCLES = 15
+N_CIRCLES = 1
 
 
 def _create_circle(self, x, y, r, **kwargs):
@@ -28,7 +29,8 @@ class Application(tk.Frame):
         self.videoPlayer = videoPlayer()
 
         # WiiBoard
-
+        self.wiiBoardSequenceX = []
+        self.wiiBoardSequenceY = []
 
         # Tk
         self.master = master
@@ -59,6 +61,9 @@ class Application(tk.Frame):
         self.videoFrame.place(anchor=tk.NE, relx = 0.95, rely = 0.15)
         self.labelVideo = tk.Label(self.videoFrame)
         self.labelVideo.pack()
+
+        self.frameSlider = tk.Scale(self.videoFrame, orient=tk.HORIZONTAL, from_= 0, command=self.onChangeSlider)
+        # self.frameSlider.pack()
         
 
     def createCanvas(self):
@@ -76,7 +81,10 @@ class Application(tk.Frame):
             self.COG_list.append(self.canvas.create_circle(canvasWidth/2, canvasHeight/2, CIRCLE_RADIUS, fill='blue', width = 0))
 
 
-
+    def onChangeSlider(self, event):
+        value = self.frameSlider.get()
+        self.setNewFrame(value)
+        self.update_COG_position(self.wiiBoardSequenceX[value], self.wiiBoardSequenceY[value])
 
     def get_COG_position(self):
         pos = self.canvas.coords(self.COG)
@@ -104,10 +112,37 @@ class Application(tk.Frame):
     def openVideo(self):
         file = tk.filedialog.askopenfilename()
         self.videoPlayer.openVideo(file)
-        print("Frames: ", self.videoPlayer.getTotalFrames())
-        img = self.videoPlayer.getFrame()
+        totalFrames = self.videoPlayer.getTotalFrames()
+        print("Frames: ", totalFrames)
+
+        img = self.setNewFrame(0)
+
+        self.frameSlider.configure(to=totalFrames-1)
+        self.frameSlider.configure(length=img.width())
+        self.frameSlider.pack()
+
+        sequence_file = file.replace(".avi", ".csv")
+        self.parseCSV(sequence_file)
+
+
+
+
+    def parseCSV(self, sequence_file):
+        self.wiiBoardSequenceX = []
+        self.wiiBoardSequenceY = []
+        with open(sequence_file) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                print(row)
+                self.wiiBoardSequenceX.append(float(row[0]))
+                self.wiiBoardSequenceY.append(float(row[1]))
+
+
+    def setNewFrame(self, frame):
+        img = self.videoPlayer.getFrame(frame)
         self.labelVideo.configure(image=img)
         self.labelVideo.image = img
+        return img
 
 
 
