@@ -150,7 +150,7 @@ class Application(tk.Frame):
 
 
 root = tk.Tk(className=' A surfear con la wiiBoard')
-root.tk.call("wm", "iconphoto", root._w, tk.PhotoImage(file='images/logos/logoFondoClaro.png'))
+root.tk.call("wm", "iconphoto", root._w, tk.PhotoImage(file='images/logos/logo_relleno.png'))
 app = Application(master=root)
 app.master.geometry("{}x{}".format(windowWidth, windowHeight))
 app.mainloop()
