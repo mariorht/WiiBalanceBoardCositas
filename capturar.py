@@ -84,6 +84,8 @@ class Application(tk.Frame):
         self.tabla = tk.PhotoImage(file='images/tabla.png')
         self.canvas.create_image(canvasWidth/2+offsetX, canvasHeight/2,anchor=tk.CENTER, image=self.tabla)
 
+        self.canvas.create_line(-(imageW/2 - 15) + canvasWidth/2, canvasHeight/2, imageW/2 - 15 + canvasWidth/2, canvasHeight/2, fill="#b3ad9b", width=3)
+
         self.COG_list = []
         self.lastCOG = 0
         for i in range(N_CIRCLES):

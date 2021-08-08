@@ -63,17 +63,16 @@ class Application(tk.Frame):
         self.labelVideo.pack()
 
         self.frameSlider = tk.Scale(self.videoFrame, orient=tk.HORIZONTAL, from_= 0, command=self.onChangeSlider)
-        # self.frameSlider.pack()
         
 
     def createCanvas(self):
         self.canvas = tk.Canvas(self.master, width=canvasWidth, height=canvasHeight)
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
 
-        # self.rectangle = self.canvas.create_rectangle(windowWidth/2-rectW/2, windowHeight/2-rectH/2, windowWidth/2+rectW/2, windowHeight/2+rectH/2)
-
         self.tabla = tk.PhotoImage(file='images/tabla.png')
         self.canvas.create_image(canvasWidth/2+offsetX, canvasHeight/2,anchor=tk.CENTER, image=self.tabla)
+
+        self.canvas.create_line(-(imageW/2 - 15) + canvasWidth/2, canvasHeight/2, imageW/2 - 15 + canvasWidth/2, canvasHeight/2, fill="#b3ad9b", width=3)
 
         self.COG_list = []
         self.lastCOG = 0
@@ -133,7 +132,6 @@ class Application(tk.Frame):
         with open(sequence_file) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
-                print(row)
                 self.wiiBoardSequenceX.append(float(row[0]))
                 self.wiiBoardSequenceY.append(float(row[1]))
 
@@ -150,7 +148,7 @@ class Application(tk.Frame):
 
 
 root = tk.Tk(className=' A surfear con la wiiBoard')
-root.tk.call("wm", "iconphoto", root._w, tk.PhotoImage(file='images/logos/logo_relleno.png'))
+root.tk.call("wm", "iconphoto", root._w, tk.PhotoImage(file='images/logos/tablatoa.png'))
 app = Application(master=root)
 app.master.geometry("{}x{}".format(windowWidth, windowHeight))
 app.mainloop()
